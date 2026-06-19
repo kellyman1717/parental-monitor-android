@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ParentalMonitor</string>
+    <string name="app_name_parent">Parental Monitor</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_monitoring">Monitoring Service</string>
+    <string name="notification_channel_alerts">Parental Alerts</string>
+    <string name="notification_monitoring_title">Parental Monitor</string>
+    <string name="notification_monitoring_text">Monitoring aktif</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility_description">Layanan ini digunakan untuk memantau aktivitas WhatsApp untuk tujuan kontrol orang tua atas anak di bawah umur. Data hanya dapat diakses oleh akun orang tua yang terotentikasi.</string>
+
+    <!-- Setup -->
+    <string name="setup_title">Setup Monitoring</string>
+    <string name="setup_step_permissions">Langkah 1: Permission</string>
+    <string name="setup_step_special">Langkah 2: Permission Khusus</string>
+    <string name="setup_step_battery">Langkah 3: Battery Optimization</string>
+    <string name="setup_grant_permissions">Grant Permissions</string>
+    <string name="setup_accessibility">Accessibility Service</string>
+    <string name="setup_notification_listener">Notification Listener</string>
+    <string name="setup_usage_stats">Usage Stats Access</string>
+    <string name="setup_battery">Disable Battery Optimization</string>
+    <string name="setup_start">Mulai Monitoring</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Parental Monitor</string>
+    <string name="dashboard_location">Lokasi Terakhir</string>
+    <string name="dashboard_sms">SMS</string>
+    <string name="dashboard_calls">Panggilan</string>
+    <string name="dashboard_whatsapp">WhatsApp</string>
+    <string name="dashboard_messages">Pesan Terbaru</string>
+    <string name="dashboard_recent_calls">Panggilan Terbaru</string>
+    <string name="dashboard_menu">Menu</string>
+
+    <!-- Login -->
+    <string name="login_title">Login Orang Tua</string>
+    <string name="register_title">Buat Akun Orang Tua</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="login_button">Login</string>
+    <string name="register_button">Daftar</string>
+    <string name="login_toggle_register">Belum punya akun? Daftar</string>
+    <string name="login_toggle_login">Sudah punya akun? Login</string>
+
+    <!-- Geofence -->
+    <string name="geofence_title">Setup Rumah</string>
+    <string name="geofence_radius">Radius</string>
+    <string name="geofence_alarm_active">Di luar rumah (ALARM AKTIF)</string>
+    <string name="geofence_inside">Di rumah</string>
+
+    <!-- Battery -->
+    <string name="battery_title">Penggunaan Baterai</string>
+    <string name="battery_status">Status Baterai</string>
+    <string name="battery_ranking">Peringkat</string>
+    <string name="battery_all_apps">Semua App</string>
+    <string name="battery_top_consumers">Aplikasi Paling Boros Baterai</string>
+    <string name="battery_charging">Mengisi</string>
+    <string name="battery_not_charging">Tidak mengisi</string>
+    <string name="battery_temperature">Suhu</string>
+    <string name="battery_voltage">Voltase</string>
+    <string name="battery_health">Kesehatan</string>
+    <string name="battery_technology">Teknologi</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Pengaturan</string>
+    <string name="settings_account">Akun</string>
+    <string name="settings_monitoring">Monitoring</string>
+    <string name="settings_secret_code">Kode Rahasia</string>
+    <string name="settings_permissions">Status Permission</string>
+    <string name="settings_device_info">Info Device</string>
+</resources>

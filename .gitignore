@@ -1,0 +1,22 @@
+# Built outputs
+*.iml
+.gradle
+/local.properties
+/.idea
+/build
+/app/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# MCP logs
+.playwright-mcp/
+
+# google-services.json — contains project credentials
+# Uncomment if repo should be private and you want to keep secrets out
+# google-services.json

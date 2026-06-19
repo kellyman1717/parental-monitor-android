@@ -1,0 +1,20 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Shield with eye icon for monitoring -->
+    <path
+        android:fillColor="#1976D2"
+        android:pathData="M54,18L28,28v20c0,18 11,35 26,42 15,-7 26,-24 26,-42V28L54,18z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,28L36,35v13c0,12 7,23 18,30 11,-7 18,-18 18,-30V35L54,28z" />
+    <!-- Eye icon in center -->
+    <path
+        android:fillColor="#1976D2"
+        android:pathData="M54,46c-7,0 -13,4 -16,9 3,5 9,9 16,9s13,-4 16,-9C67,50 61,46 54,46zM54,60c-3,0 -5,-2 -5,-5s2,-5 5,-5 5,2 5,5S57,60 54,60z" />
+    <path
+        android:fillColor="#1976D2"
+        android:pathData="M54,52m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0" />
+</vector>

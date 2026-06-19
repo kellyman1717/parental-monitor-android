@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parental Monitor — Calm Redesign</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #f0eee9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    input[type="range"] { accent-color: currentColor; }
+    .screen-selector {
+      position: fixed; top: 12px; right: 12px; z-index: 100;
+      background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
+      border-radius: 12px; padding: 12px 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      font-size: 13px; display: flex; align-items: center; gap: 10px;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    .screen-selector select {
+      padding: 6px 10px; border-radius: 8px; border: 1px solid #ddd;
+      font-size: 13px; background: #fff; cursor: pointer;
+    }
+  </style>
+  <!-- React + Babel CDN -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- Component files in dependency order -->
+  <script type="text/babel" src="palettes.jsx"></script>
+  <script type="text/babel" src="icons.jsx"></script>
+  <script type="text/babel" src="components.jsx"></script>
+  <script type="text/babel" src="screens-auth.jsx"></script>
+  <script type="text/babel" src="screens-child.jsx"></script>
+  <script type="text/babel" src="screens-parent.jsx"></script>
+  <script type="text/babel" src="app.jsx"></script>
+  <script type="text/babel" src="android-frame.jsx"></script>
+  <script type="text/babel" src="design-canvas.jsx"></script>
+
+  <script type="text/babel">
+    // ─── Screen selector (fixed overlay) ─────────────────────
+    function ScreenSelector({ current, onChange }) {
+      const screens = [
+        { value: 'login', label: 'Login' },
+        { value: 'dashboard', label: 'Dashboard' },
+        { value: 'location', label: 'Lokasi' },
+        { value: 'geofence', label: 'Geofence' },
+        { value: 'messages', label: 'Pesan (SMS+WA)' },
+        { value: 'calls', label: 'Panggilan' },
+        { value: 'appusage', label: 'App Usage' },
+        { value: 'battery', label: 'Baterai' },
+        { value: 'settings', label: 'Pengaturan' },
+        { value: 'setup', label: 'Setup (Anak)' },
+        { value: 'pairingwait', label: 'Pairing Wait' },
+        { value: 'status', label: 'Status (Anak)' },
+        { value: 'pairdevice', label: 'Pair Device' },
+      ];
+      return (
+        <div className="screen-selector">
+          <span style={{ fontWeight: 600, color: '#555' }}>Layar:</span>
+          <select value={current} onChange={e => onChange(e.target.value)}>
+            {screens.map(s => (
+              <option key={s.value} value={s.value}>{s.label}</option>
+            ))}
+          </select>
+        </div>
+      );
+    }
+
+    // ─── Custom phone frame (respects palette colors) ─────────
+    function PhoneFrame({ children, p, width = 380, height = 780 }) {
+      return (
+        <div style={{
+          width, height, borderRadius: 18, overflow: 'hidden',
+          background: p.bg,
+          border: '8px solid rgba(116,119,117,0.5)',
+          boxShadow: '0 30px 80px rgba(0,0,0,0.25)',
+          display: 'flex', flexDirection: 'column', boxSizing: 'border-box',
+        }}>
+          {/* Status bar */}
+          <div style={{
+            height: 40, display: 'flex', alignItems: 'center',
+            justifyContent: 'space-between', padding: '0 16px',
+            position: 'relative', fontFamily: TYPE.family, flexShrink: 0,
+          }}>
+            <span style={{ fontSize: 14, color: p.text }}>9:30</span>
+            <div style={{
+              width: 24, height: 24, borderRadius: 100,
+              background: '#2e2e2e', position: 'absolute', left: '50%', top: 8, transform: 'translateX(-50%)',
+            }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 13.3L.67 5.97a10.37 10.37 0 0114.66 0L8 13.3z" fill={p.text}/></svg>
+              <svg width="16" height="16" viewBox="0 0 16 16"><rect x="3.75" y="2" width="8.5" height="13" rx="1.5" fill={p.text}/></svg>
+            </div>
+          </div>
+          {/* Content */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'auto', minHeight: 0 }}>
+            {children}
+          </div>
+          {/* Nav pill */}
+          <div style={{ height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 108, height: 4, borderRadius: 2, background: p.text, opacity: 0.3 }} />
+          </div>
+        </div>
+      );
+    }
+
+    // ─── One palette artboard ────────────────────────────────
+    function PaletteArtboard({ paletteKey, palette, sharedScreen, onScreenChange }) {
+      return (
+        <PhoneFrame p={palette} width={380} height={780}>
+          <ParentalMonitorApp
+            p={palette}
+            screenOverride={sharedScreen}
+            onScreenChange={onScreenChange}
+          />
+        </PhoneFrame>
+      );
+    }
+
+    // ─── Main app ────────────────────────────────────────────
+    function App() {
+      const [sharedScreen, setSharedScreen] = React.useState('dashboard');
+
+      const paletteEntries = [
+        ['sage', PALETTE_SAGE],
+        ['blue', PALETTE_BLUE],
+        ['mauve', PALETTE_MAUVE],
+      ];
+
+      return (
+        <div>
+          {/* Screen selector */}
+          <ScreenSelector
+            current={sharedScreen}
+            onChange={(s) => setSharedScreen(s)}
+          />
+
+          {/* Header */}
+          <div style={{
+            textAlign: 'center', padding: '48px 24px 16px',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+          }}>
+            <h1 style={{
+              fontSize: '28px', fontWeight: 700, color: '#3a3a3a',
+              marginBottom: '6px',
+            }}>
+              Parental Monitor — Calm Redesign
+            </h1>
+            <p style={{ fontSize: '15px', color: '#888', maxWidth: 520, margin: '0 auto' }}>
+              3 variasi palet warna calm. Klik navigasi di dalam device untuk explore flow.
+              Gunakan selector di kanan atas untuk loncat antar layar.
+            </p>
+          </div>
+
+          {/* 3 artboards side-by-side */}
+          <div style={{
+            display: 'flex', justifyContent: 'center', gap: '32px',
+            padding: '24px 24px 64px', flexWrap: 'wrap',
+          }}>
+            {paletteEntries.map(([key, pal]) => (
+              <div key={key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {/* Palette label */}
+                <div style={{
+                  marginBottom: '12px', textAlign: 'center',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+                }}>
+                  <div style={{
+                    fontSize: '17px', fontWeight: 700, color: '#3a3a3a',
+                    marginBottom: '2px',
+                  }}>{pal.name}</div>
+                  <div style={{ fontSize: '12px', color: '#999' }}>{pal.tagline}</div>
+                  {/* Color swatches */}
+                  <div style={{ display: 'flex', gap: '4px', marginTop: '8px', justifyContent: 'center' }}>
+                    {[pal.primary, pal.secondary, pal.accent, pal.bg, pal.surfaceAlt].map((c, i) => (
+                      <div key={i} style={{
+                        width: 20, height: 20, borderRadius: '50%',
+                        background: c, border: '2px solid #fff',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+                      }} />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Device frame */}
+                <PaletteArtboard
+                  paletteKey={key}
+                  palette={pal}
+                  sharedScreen={sharedScreen}
+                  onScreenChange={setSharedScreen}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Token reference */}
+          <div style={{
+            maxWidth: 900, margin: '0 auto', padding: '0 24px 64px',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+          }}>
+            <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#3a3a3a', marginBottom: '16px' }}>
+              Design Tokens
+            </h2>
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px',
+            }}>
+              {paletteEntries.map(([key, pal]) => (
+                <div key={key} style={{
+                  background: '#fff', borderRadius: '14px', padding: '20px',
+                  border: '1px solid #e5e5e5',
+                }}>
+                  <div style={{ fontSize: '15px', fontWeight: 600, color: '#3a3a3a', marginBottom: '12px' }}>
+                    {pal.name}
+                  </div>
+                  {[
+                    ['Primary', pal.primary],
+                    ['Secondary', pal.secondary],
+                    ['Accent', pal.accent],
+                    ['Background', pal.bg],
+                    ['Surface', pal.surface],
+                    ['Surface Alt', pal.surfaceAlt],
+                    ['Border', pal.border],
+                    ['Text', pal.text],
+                    ['Text Muted', pal.textMuted],
+                    ['Success', pal.success],
+                    ['Warning', pal.warning],
+                    ['Danger', pal.danger],
+                  ].map(([label, val]) => (
+                    <div key={label} style={{
+                      display: 'flex', alignItems: 'center', gap: '8px',
+                      padding: '4px 0', fontSize: '12px',
+                    }}>
+                      <div style={{
+                        width: 16, height: 16, borderRadius: '4px',
+                        background: val, border: '1px solid rgba(0,0,0,0.1)',
+                        flexShrink: 0,
+                      }} />
+                      <span style={{ color: '#666', flex: 1 }}>{label}</span>
+                      <code style={{ fontSize: '11px', color: '#999' }}>{val}</code>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ─── Mount ───────────────────────────────────────────────
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
